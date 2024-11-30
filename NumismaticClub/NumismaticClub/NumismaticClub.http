@@ -1,0 +1,6 @@
+@NumismaticClub_HostAddress = http://localhost:5163
+
+GET {{NumismaticClub_HostAddress}}/numismatic-club/
+Accept: application/json
+
+###
