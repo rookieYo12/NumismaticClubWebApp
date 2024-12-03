@@ -11,6 +11,9 @@ builder.Services.Configure<UsersDbSettings>(
 // UsersService class is registered in DI as singleton
 builder.Services.AddSingleton<UsersService>();
 
+// Add consumer to DI like background service
+builder.Services.AddHostedService<ConsumerService>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
