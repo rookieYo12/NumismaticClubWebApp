@@ -1,5 +1,6 @@
 ﻿using Confluent.Kafka;
 
+
 namespace UserApi.Services
 {
     // Consumer realized like background service
@@ -32,8 +33,12 @@ namespace UserApi.Services
             {
                 try
                 {
-                    var consumeResult = _consumer.Consume(cancellationToken);
-                    Console.WriteLine(consumeResult.Message.Value);
+                    var consumeResult = _consumer.Consume(cancellationToken).Message.Value;
+                    
+                    if (!string.IsNullOrWhiteSpace(consumeResult))
+                    {
+                        // Process message ...
+                    }
                 }
                 catch (OperationCanceledException) // When a cancel signal is received 
                 {
