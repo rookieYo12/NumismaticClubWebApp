@@ -8,8 +8,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<UsersDbSettings>(
     builder.Configuration.GetSection("UsersDatabase"));
 
-// UsersService class is registered in DI as singleton
+// Service for use database
 builder.Services.AddSingleton<UsersService>();
+
+// Processing service of Kafka messages
+builder.Services.AddSingleton<RequestProcessingService>();
 
 // Add consumer to DI like background service
 builder.Services.AddHostedService<ConsumerService>();

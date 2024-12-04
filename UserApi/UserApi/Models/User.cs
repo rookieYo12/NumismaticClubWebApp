@@ -13,6 +13,6 @@ namespace UserApi.Models
 
         public string Surname { get; set; } = null!;
 
-        public int RegisteredObjects { get; } = 0;
+        public int RegisteredObjects { get; set; } = 0;
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Confluent.Kafka;
-
+using UserApi.Services;
 
 namespace UserApi.Services
 {
@@ -7,8 +7,9 @@ namespace UserApi.Services
     public class ConsumerService : BackgroundService
     {
         private readonly IConsumer<Ignore, string> _consumer;
+        private readonly RequestProcessingService _requestProcessingService;
 
-        public ConsumerService()
+        public ConsumerService(RequestProcessingService requestProcessingService)
         {
             var config = new ConsumerConfig
             {
@@ -18,6 +19,7 @@ namespace UserApi.Services
             };
 
             _consumer = new ConsumerBuilder<Ignore, string>(config).Build();
+            _requestProcessingService = requestProcessingService;
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -25,7 +27,7 @@ namespace UserApi.Services
             return Task.Run(() => StartConsumerLoop(stoppingToken), stoppingToken);
         }
 
-        private void StartConsumerLoop(CancellationToken cancellationToken)
+        private async Task StartConsumerLoop(CancellationToken cancellationToken)
         {
             _consumer.Subscribe("coin-topic");
 
@@ -34,10 +36,10 @@ namespace UserApi.Services
                 try
                 {
                     var consumeResult = _consumer.Consume(cancellationToken).Message.Value;
-                    
+
                     if (!string.IsNullOrWhiteSpace(consumeResult))
                     {
-                        // Process message ...
+                        await _requestProcessingService.ProcessRequest(consumeResult);
                     }
                 }
                 catch (OperationCanceledException) // When a cancel signal is received 
