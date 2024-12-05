@@ -1,7 +1,7 @@
 ﻿using Confluent.Kafka;
-using UserApi.Services;
+using NumismaticClub.Services;
 
-namespace UserApi.Services
+namespace NumismaticClub.Services
 {
     // Consumer realized like background service
     public class ConsumerService : BackgroundService
@@ -14,7 +14,7 @@ namespace UserApi.Services
             var config = new ConsumerConfig
             {
                 BootstrapServers = "localhost:9092",
-                GroupId = "user-group",
+                GroupId = "coin-group",
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
 
@@ -29,7 +29,7 @@ namespace UserApi.Services
 
         private async Task StartConsumerLoop(CancellationToken cancellationToken)
         {
-            _consumer.Subscribe("user-topic");
+            _consumer.Subscribe("coin-topic");
 
             while (!cancellationToken.IsCancellationRequested)
             {

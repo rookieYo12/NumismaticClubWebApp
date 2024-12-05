@@ -14,5 +14,9 @@ namespace NumismaticClub.Models
         public string Country { get; set; } = null!;
 
         public int Value { get; set; }
+
+        public string UserId { get; set; } = null!;
+
+        public string Confirmed { get; } = "Not confirmed.";
     }
 }

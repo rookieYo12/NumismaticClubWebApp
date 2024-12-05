@@ -1,5 +1,6 @@
 using NumismaticClub.Models;
 using NumismaticClub.Services;
+using UserApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,14 @@ builder.Services.AddStackExchangeRedisCache(options =>
     // Instance for name in Redis cache
     options.InstanceName = builder.Configuration["RedisCacheOptions:InstanceName"];
 });
+
+// Add consumer to DI like background service
+builder.Services.AddHostedService<ConsumerService>();
+
+// Processing service of Kafka messages
+builder.Services.AddSingleton<RequestProcessingService>();
+
+builder.Services.AddSingleton<ProducerService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

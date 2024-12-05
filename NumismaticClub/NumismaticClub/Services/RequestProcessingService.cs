@@ -1,8 +1,8 @@
-﻿using UserApi.Models;
-using UserApi.Services;
+﻿using NumismaticClub.Models;
+using NumismaticClub.Services;
 using System.Text.Json;
 
-namespace UserApi.Services
+namespace NumismaticClub.Services
 {
     // Service processes Kafka messages
     public class RequestProcessingService
