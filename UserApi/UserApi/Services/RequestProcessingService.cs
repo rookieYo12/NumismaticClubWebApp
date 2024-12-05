@@ -8,10 +8,13 @@ namespace UserApi.Services
     public class RequestProcessingService
     {
         private readonly UsersService _usersService;
+        private readonly ProducerService _producerService;
 
-        public RequestProcessingService(UsersService usersService)
+        public RequestProcessingService(UsersService usersService, 
+            ProducerService producerService)
         {
             _usersService = usersService;
+            _producerService = producerService;
         }
 
         public async Task ProcessRequest(string message)
@@ -35,8 +38,8 @@ namespace UserApi.Services
                 CoinId = requestObj.CoinId,
                 UpdateTime = updateTime
             });
-            
 
+            _producerService.Produce(response);
         }
     }
 }

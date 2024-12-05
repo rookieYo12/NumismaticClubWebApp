@@ -29,7 +29,7 @@ namespace UserApi.Services
 
         private async Task StartConsumerLoop(CancellationToken cancellationToken)
         {
-            _consumer.Subscribe("coin-topic");
+            _consumer.Subscribe("user-topic");
 
             while (!cancellationToken.IsCancellationRequested)
             {

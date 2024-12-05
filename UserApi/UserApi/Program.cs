@@ -11,11 +11,13 @@ builder.Services.Configure<UsersDbSettings>(
 // Service for use database
 builder.Services.AddSingleton<UsersService>();
 
+// Add consumer to DI like background service
+builder.Services.AddHostedService<ConsumerService>();
+
 // Processing service of Kafka messages
 builder.Services.AddSingleton<RequestProcessingService>();
 
-// Add consumer to DI like background service
-builder.Services.AddHostedService<ConsumerService>();
+builder.Services.AddSingleton<ProducerService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
