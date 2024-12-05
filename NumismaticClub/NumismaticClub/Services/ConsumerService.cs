@@ -7,9 +7,9 @@ namespace NumismaticClub.Services
     public class ConsumerService : BackgroundService
     {
         private readonly IConsumer<Ignore, string> _consumer;
-        private readonly RequestProcessingService _requestProcessingService;
+        private readonly MessageProcessingService _messageProcessingService;
 
-        public ConsumerService(RequestProcessingService requestProcessingService)
+        public ConsumerService(MessageProcessingService messageProcessingService)
         {
             var config = new ConsumerConfig
             {
@@ -19,7 +19,7 @@ namespace NumismaticClub.Services
             };
 
             _consumer = new ConsumerBuilder<Ignore, string>(config).Build();
-            _requestProcessingService = requestProcessingService;
+            _messageProcessingService = messageProcessingService;
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -39,7 +39,7 @@ namespace NumismaticClub.Services
 
                     if (!string.IsNullOrWhiteSpace(consumeResult))
                     {
-                        await _requestProcessingService.ProcessRequest(consumeResult);
+                        await _messageProcessingService.Process(consumeResult);
                     }
                 }
                 catch (OperationCanceledException) // When a cancel signal is received 

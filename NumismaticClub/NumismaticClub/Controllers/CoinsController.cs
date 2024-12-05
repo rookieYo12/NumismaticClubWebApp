@@ -12,11 +12,13 @@ namespace NumismaticClub.Controllers
     {
         private readonly CoinsService _coinsService;
         private readonly IDistributedCache _cache;
+        private readonly ProducerService _producer;
 
-        public CoinsController(CoinsService coinsService, IDistributedCache cache)
+        public CoinsController(CoinsService coinsService, IDistributedCache cache, ProducerService producer)
         {
             _coinsService = coinsService;
             _cache = cache;
+            _producer = producer;
         }
 
         [HttpGet]
@@ -61,6 +63,14 @@ namespace NumismaticClub.Controllers
         public async Task<IActionResult> Post(Coin newCoin)
         {
             await _coinsService.CreateAsync(newCoin);
+
+            Request request = new Request
+            {
+                UserId = newCoin.UserId,
+                CoinId = newCoin.Id
+            };
+
+            _producer.Produce(JsonSerializer.Serialize(request));
 
             return CreatedAtAction(nameof(Get), new { id = newCoin.Id }, newCoin);
         }

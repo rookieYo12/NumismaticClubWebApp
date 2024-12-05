@@ -1,6 +1,5 @@
 using NumismaticClub.Models;
 using NumismaticClub.Services;
-using UserApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +25,7 @@ builder.Services.AddStackExchangeRedisCache(options =>
 builder.Services.AddHostedService<ConsumerService>();
 
 // Processing service of Kafka messages
-builder.Services.AddSingleton<RequestProcessingService>();
+builder.Services.AddSingleton<MessageProcessingService>();
 
 builder.Services.AddSingleton<ProducerService>();
 

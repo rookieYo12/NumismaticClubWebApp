@@ -17,6 +17,11 @@ namespace NumismaticClub.Models
 
         public string UserId { get; set; } = null!;
 
-        public string Confirmed { get; } = "Not confirmed.";
+        public string Confirmed { get; private set; } = "Not confirmed.";
+
+        public void setConfirmed(string value)
+        {
+            this.Confirmed = value;
+        }
     }
 }

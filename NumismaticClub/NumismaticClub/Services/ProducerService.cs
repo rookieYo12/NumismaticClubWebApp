@@ -1,6 +1,6 @@
 ﻿using Confluent.Kafka;
 
-namespace UserApi.Services
+namespace NumismaticClub.Services
 {
     // Kafka producer
     public class ProducerService
