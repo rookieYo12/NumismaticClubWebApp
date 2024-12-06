@@ -8,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<UsersDbSettings>(
     builder.Configuration.GetSection("UsersDatabase"));
 
+// TODO: maybe try do services scoped
+
 // Service for use database
 builder.Services.AddSingleton<UsersService>();
 

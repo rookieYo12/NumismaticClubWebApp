@@ -2,6 +2,8 @@
 using MongoDB.Bson;
 using NumismaticClub.Models;
 using NumismaticClub.Services;
+using System.Net.WebSockets;
+using System.Text.Json;
 
 namespace NumismaticClub.Controllers
 {
@@ -10,10 +12,12 @@ namespace NumismaticClub.Controllers
     public class TestsController : ControllerBase
     {
         private readonly CoinsService _coinsService;
+        private readonly ProducerService _producer;
 
-        public TestsController(CoinsService coinsService)
+        public TestsController(CoinsService coinsService, ProducerService producer)
         {
             _coinsService = coinsService;
+            _producer = producer;
         }
 
         // Генерация случайных данных для монет
@@ -25,10 +29,11 @@ namespace NumismaticClub.Controllers
             {
                 coins.Add(new Coin
                 {
-                    Id = ObjectId.GenerateNewId().ToString(),  // Генерация корректного ObjectId
+                    Id = ObjectId.GenerateNewId().ToString(),
                     Year = random.Next(1800, 2024),
                     Country = $"Country {i}",
                     Value = random.Next(1, 1000),
+                    UserId = "6752725c94193045d1f5d6a9",
                 });
             }
             return coins;
@@ -43,6 +48,14 @@ namespace NumismaticClub.Controllers
             foreach (var coin in coins)
             {
                 await _coinsService.CreateAsync(coin);
+
+                Request request = new Request
+                {
+                    UserId = coin.UserId,
+                    CoinId = coin.Id
+                };
+
+                _producer.Produce(JsonSerializer.Serialize(request));
             }
 
             return Ok(new { message = "100 монет успешно добавлены в базу данных." });
