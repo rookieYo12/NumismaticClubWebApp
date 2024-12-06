@@ -1,5 +1,4 @@
 ﻿using UserApi.Models;
-using UserApi.Services;
 using System.Text.Json;
 
 namespace UserApi.Services
@@ -17,17 +16,23 @@ namespace UserApi.Services
             _producerService = producerService;
         }
 
-        public async Task ProcessRequest(string message)
+        public async Task Process(string message)
         {
-            var requestObj = JsonSerializer.Deserialize<Request>(message);
+            var request = JsonSerializer.Deserialize<Request>(message);
 
             // Fetch user from db
-            var user = await _usersService.GetAsync(requestObj.UserId);
+            var user = await _usersService.GetAsync(request.UserId);
 
-            user.RegisteredObjects++;
+            if (user == null)
+            {
+                Console.WriteLine($"User with ID {request.UserId} not found.");
+                return;
+            }
+
+            user.IncremetRegisteredObjects();
 
             // Update user in db
-            await _usersService.UpdateAsync(requestObj.UserId, user);
+            await _usersService.UpdateAsync(request.UserId, user);
             
             // Get update time
             DateTimeOffset now = DateTimeOffset.Now;
@@ -35,7 +40,7 @@ namespace UserApi.Services
 
             var response = JsonSerializer.Serialize(new Response
             {
-                CoinId = requestObj.CoinId,
+                CoinId = request.CoinId,
                 UpdateTime = updateTime
             });
 

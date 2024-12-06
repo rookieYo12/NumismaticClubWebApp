@@ -70,6 +70,7 @@ namespace NumismaticClub.Controllers
                 CoinId = newCoin.Id
             };
 
+            // Send request to another service
             _producer.Produce(JsonSerializer.Serialize(request));
 
             return CreatedAtAction(nameof(Get), new { id = newCoin.Id }, newCoin);

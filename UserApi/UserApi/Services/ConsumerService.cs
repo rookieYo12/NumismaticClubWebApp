@@ -1,5 +1,4 @@
 ﻿using Confluent.Kafka;
-using UserApi.Services;
 
 namespace UserApi.Services
 {
@@ -39,7 +38,7 @@ namespace UserApi.Services
 
                     if (!string.IsNullOrWhiteSpace(consumeResult))
                     {
-                        await _requestProcessingService.ProcessRequest(consumeResult);
+                        await _requestProcessingService.Process(consumeResult);
                     }
                 }
                 catch (OperationCanceledException) // When a cancel signal is received 
