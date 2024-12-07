@@ -1,0 +1,20 @@
+{
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:5290" // Gateway url
+  },
+  "Routes": [
+    {
+      "UpstreamPathTemplate": "/api/Coins",
+      "UpstreamHttpMethod": [ "Get", "Post" ],
+
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5163
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Coins"
+    }
+  ]
+}
