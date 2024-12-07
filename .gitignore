@@ -6,8 +6,7 @@
 # My project files and folders
 CoinsDb/
 UsersDb/
-startCoinsDb.bat
-startUsersDb.bat
+startDbs.bat
 
 # dotenv files
 .env

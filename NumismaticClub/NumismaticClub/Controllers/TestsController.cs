@@ -63,6 +63,8 @@ namespace NumismaticClub.Controllers
             return Ok(new { message = "100 монет успешно добавлены в базу данных." });
         }
 
+        /* Long time
+
         // Тест 2: Добавление 100,000 монет
         [HttpPost("add-100000-coins")]
         public async Task<IActionResult> Add100000Coins(string UserId)
@@ -85,6 +87,8 @@ namespace NumismaticClub.Controllers
 
             return Ok(new { message = "100 000 монет успешно добавлены в базу данных." });
         }
+
+        */
 
         // Тест 3: Удаление всех монет
         [HttpDelete("delete-all-coins")]
