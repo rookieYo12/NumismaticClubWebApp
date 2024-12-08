@@ -4,6 +4,21 @@
   },
   "Routes": [
     {
+      // To gateway
+      "UpstreamPathTemplate": "/{everything}",
+      "UpstreamHttpMethod": [ "Post" ],
+      
+      // From gateway
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "", // TODO: add
+          "Port": // also add
+        }
+      ],
+      "DownstreamPathTemplate": "/{everything}"
+    },
+    {
       "UpstreamPathTemplate": "/api/Coins",
       "UpstreamHttpMethod": [ "Get", "Post" ],
 
