@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<UsersDbSettings>(
     builder.Configuration.GetSection("UsersDatabase"));
 
-// Service for use database
+// Service for using database
 builder.Services.AddSingleton<UsersService>();
 
 // Add consumer to DI like background service

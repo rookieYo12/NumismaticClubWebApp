@@ -6,6 +6,7 @@
 # My project files and folders
 CoinsDb/
 UsersDb/
+AuthDb/
 startDbs.bat
 
 # dotenv files
