@@ -41,5 +41,13 @@ namespace AuthApi.Services
 
             return new JwtSecurityTokenHandler().WriteToken(jwtToken);
         }
+
+        public string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            return Convert.ToHexString(randomNumber);
+        }
     }
 }

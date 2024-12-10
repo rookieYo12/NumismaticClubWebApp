@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using AuthApi.Models;
 using AuthApi.Services;
+using System.CodeDom.Compiler;
 
 namespace AuthApi.Controllers
 {
@@ -9,10 +10,12 @@ namespace AuthApi.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserService _usersService;
+        private readonly TokenService _tokenService;
 
-        public AuthController(UserService usersService)
+        public AuthController(UserService usersService, TokenService tokenService)
         {
             _usersService = usersService;
+            _tokenService = tokenService;
         }
 
         [HttpPost("signup")]
@@ -61,7 +64,7 @@ namespace AuthApi.Controllers
                 return BadRequest("Wrong password.");
             }
 
-            return;
+            return Ok(_tokenService.GenerateToken(user));
         }
     }
 }

@@ -5,21 +5,21 @@
   "Routes": [
     {
       // To gateway
-      "UpstreamPathTemplate": "/{everything}",
+      "UpstreamPathTemplate": "/auth/{everything}",
       "UpstreamHttpMethod": [ "Post" ],
       
       // From gateway
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "", // TODO: add
-          "Port": // also add
+          "Host": "localhost",
+          "Port": 5043
         }
       ],
-      "DownstreamPathTemplate": "/{everything}"
+      "DownstreamPathTemplate": "/api/auth/{everything}"
     },
     {
-      "UpstreamPathTemplate": "/api/Coins",
+      "UpstreamPathTemplate": "/coins",
       "UpstreamHttpMethod": [ "Get", "Post" ],
 
       "DownstreamScheme": "http",
@@ -29,7 +29,11 @@
           "Port": 5163
         }
       ],
-      "DownstreamPathTemplate": "/api/Coins"
+      "DownstreamPathTemplate": "/api/Coins",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
     }
   ]
 }
