@@ -21,7 +21,7 @@ namespace NumismaticClub.Models
 
         public void setConfirmed(string value)
         {
-            this.Confirmed = value;
+            Confirmed = value;
         }
     }
 }

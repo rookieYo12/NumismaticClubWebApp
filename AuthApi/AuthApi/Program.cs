@@ -8,7 +8,7 @@ builder.Services.Configure<DbSettings>(
     builder.Configuration.GetSection("UsersDatabase"));
 
 // Service for using db
-builder.Services.AddSingleton<UsersService>();
+builder.Services.AddSingleton<UserService>();
 
 builder.Services.AddControllers();
 

@@ -8,29 +8,60 @@ namespace AuthApi.Controllers
     [Route("api/auth")]
     public class AuthController : ControllerBase
     {
-        private readonly UsersService _usersService;
+        private readonly UserService _usersService;
 
-        public AuthController(UsersService usersService)
+        public AuthController(UserService usersService)
         {
             _usersService = usersService;
         }
 
         [HttpPost("signup")]
-        public async Task<IActionResult> SignUp(AuthInfo authInfo)
+        public async Task<IActionResult> SignUp(AuthRequest authRequest)
         {
-            if (await _usersService.GetAsync(authInfo.Login) != null)
+            if (string.IsNullOrWhiteSpace(authRequest.Name) ||
+                string.IsNullOrWhiteSpace(authRequest.Password))
             {
-                return BadRequest("User with this login already exists");
+                return BadRequest("Wrong fields.");
+            }
+
+            if (await _usersService.GetAsync(authRequest.Name) != null)
+            {
+                return BadRequest("User with this login already exists.");
             }
 
             await _usersService.CreateAsync(new User
             {
                 Id = "",
-                Login = authInfo.Login,
-                Password = authInfo.Password
+                Name = authRequest.Name,
+                Password = authRequest.Password,
+                Role = UserRole.User
             });
 
             return StatusCode(201); // Created
+        }
+
+        [HttpPost("signin")]
+        public async Task<IActionResult> SignIn(AuthRequest authRequest)
+        {
+            if (string.IsNullOrWhiteSpace(authRequest.Name) || 
+                string.IsNullOrWhiteSpace(authRequest.Password))
+            {
+                return BadRequest("Wrong fields.");
+            }
+            
+            var user = await _usersService.GetAsync(authRequest.Name);
+
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            if (authRequest.Password != user.Password)
+            {
+                return BadRequest("Wrong password.");
+            }
+
+            return;
         }
     }
 }

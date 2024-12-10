@@ -4,12 +4,12 @@ using Microsoft.Extensions.Options;
 
 namespace AuthApi.Services
 {
-    public class UsersService
+    public class UserService
     {
         private readonly IMongoCollection<User> _usersCollection;
 
         // Get users collection from db
-        public UsersService(IOptions<DbSettings> dbSettings)
+        public UserService(IOptions<DbSettings> dbSettings)
         {
             var mongoClient = new MongoClient(
                 dbSettings.Value.ConnectionString);
@@ -21,9 +21,9 @@ namespace AuthApi.Services
                 dbSettings.Value.UsersCollectionName);
         }
 
-        // Get user by login
-        public async Task<User?> GetAsync(string login) =>
-            await _usersCollection.Find(x => x.Login == login).FirstOrDefaultAsync();
+        // Get user by username
+        public async Task<User?> GetAsync(string name) =>
+            await _usersCollection.Find(x => x.Name == name).FirstOrDefaultAsync();
 
         // Insert a new user
         public async Task CreateAsync(User newUser) =>
