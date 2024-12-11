@@ -28,5 +28,9 @@ namespace AuthApi.Services
         // Insert a new user
         public async Task CreateAsync(User newUser) =>
             await _usersCollection.InsertOneAsync(newUser);
+
+        // Update by name
+        public async Task UpdateAsync(string name, User updatedUser) =>
+            await _usersCollection.ReplaceOneAsync(x => x.Name == name, updatedUser);
     }
 }

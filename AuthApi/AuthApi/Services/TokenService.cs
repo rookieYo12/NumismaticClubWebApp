@@ -15,7 +15,7 @@ namespace AuthApi.Services
         private const string KEY = "mysupersecret_secretsecretsecretkey!123";
         private const string ISS = "AuthApi";
         private const string AUD = "ApiGateway";
-        private const int EXP = 15;
+        private const int EXP = 5; // In minutes
 
         private static SymmetricSecurityKey GetSymmetricSecurityKey() =>
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(KEY));
@@ -45,9 +45,11 @@ namespace AuthApi.Services
         public string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
-            using var rng = RandomNumberGenerator.Create();
-            rng.GetBytes(randomNumber);
-            return Convert.ToHexString(randomNumber);
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                return Convert.ToHexString(randomNumber);
+            }
         }
     }
 }

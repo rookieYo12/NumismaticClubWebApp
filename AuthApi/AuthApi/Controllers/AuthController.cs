@@ -46,6 +46,7 @@ namespace AuthApi.Controllers
         [HttpPost("signin")]
         public async Task<IActionResult> SignIn(AuthRequest authRequest)
         {
+            // Trying to recognize the user
             if (string.IsNullOrWhiteSpace(authRequest.Name) || 
                 string.IsNullOrWhiteSpace(authRequest.Password))
             {
@@ -56,15 +57,29 @@ namespace AuthApi.Controllers
 
             if (user == null)
             {
-                return NotFound("User not found.");
+                return Unauthorized("User not found.");
             }
 
             if (authRequest.Password != user.Password)
             {
-                return BadRequest("Wrong password.");
+                return Unauthorized("Wrong password.");
             }
 
-            return Ok(_tokenService.GenerateToken(user));
+            // If authentication is successful generate tokens
+            var accessToken = _tokenService.GenerateToken(user);
+            var refreshToken = _tokenService.GenerateRefreshToken();
+
+            // Update user
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddMinutes(10);
+            
+            await _usersService.UpdateAsync(user.Name, user);
+
+            return Ok(new AuthResponse
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            });
         }
     }
 }
