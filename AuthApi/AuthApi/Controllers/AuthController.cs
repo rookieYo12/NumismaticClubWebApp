@@ -2,6 +2,8 @@
 using AuthApi.Models;
 using AuthApi.Services;
 using System.CodeDom.Compiler;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace AuthApi.Controllers
 {
@@ -9,12 +11,12 @@ namespace AuthApi.Controllers
     [Route("api/auth")]
     public class AuthController : ControllerBase
     {
-        private readonly UserService _usersService;
+        private readonly UserService _userService;
         private readonly TokenService _tokenService;
 
         public AuthController(UserService usersService, TokenService tokenService)
         {
-            _usersService = usersService;
+            _userService = usersService;
             _tokenService = tokenService;
         }
 
@@ -27,12 +29,12 @@ namespace AuthApi.Controllers
                 return BadRequest("Wrong fields.");
             }
 
-            if (await _usersService.GetAsync(authRequest.Name) != null)
+            if (await _userService.GetAsync(authRequest.Name) != null)
             {
                 return BadRequest("User with this login already exists.");
             }
 
-            await _usersService.CreateAsync(new User
+            await _userService.CreateAsync(new User
             {
                 Id = "",
                 Name = authRequest.Name,
@@ -53,7 +55,7 @@ namespace AuthApi.Controllers
                 return BadRequest("Wrong fields.");
             }
             
-            var user = await _usersService.GetAsync(authRequest.Name);
+            var user = await _userService.GetAsync(authRequest.Name);
 
             if (user == null)
             {
@@ -65,21 +67,80 @@ namespace AuthApi.Controllers
                 return Unauthorized("Wrong password.");
             }
 
-            // If authentication is successful generate tokens
-            var accessToken = _tokenService.GenerateToken(user);
+            // If authentication is successful get payload information
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Sub,  user.Id),
+                new Claim(JwtRegisteredClaimNames.Name, user.Name),
+                new Claim(ClaimTypes.Role, user.Role.ToString()),
+            };
+
+            // Generate tokens
+            var accessToken = _tokenService.GenerateToken(claims);
             var refreshToken = _tokenService.GenerateRefreshToken();
 
             // Update user
             user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddMinutes(10);
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.Add(TimeSpan.FromMinutes(3));
             
-            await _usersService.UpdateAsync(user.Name, user);
+            await _userService.UpdateAsync(user.Name, user);
 
-            return Ok(new AuthResponse
+            return Ok(new TokenModel
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken
             });
+        }
+
+        [HttpPost]
+        [Route("refresh")]
+        public async Task<IActionResult> Refresh(TokenModel refreshRequest)
+        {
+            if (string.IsNullOrWhiteSpace(refreshRequest.AccessToken) ||
+                string.IsNullOrWhiteSpace(refreshRequest.RefreshToken))
+            {
+                return BadRequest("Wrong access or refresh token.");
+            }
+
+            try
+            {
+                // Check access token
+                var principal = _tokenService.GetPrincipalFromExpiredToken(refreshRequest.AccessToken);
+
+                var user = await _userService.GetAsync(principal.Identity.Name);
+
+                if (user == null)
+                {
+                    return BadRequest("Wrong access token.");
+                }
+
+                // Check refresh token
+                if (user.RefreshToken != refreshRequest.RefreshToken ||
+                    user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+                {
+                    return BadRequest("Wrong refresh token.");
+                }
+
+                // Generate new tokens
+                var newAccessToken = _tokenService.GenerateToken(principal.Claims.ToList());
+                var newRefreshToken = _tokenService.GenerateRefreshToken();
+
+                // Update user
+                user.RefreshToken = newRefreshToken;
+                await _userService.UpdateAsync(user.Name, user);
+
+                // TODO: cookie?
+
+                return Ok(new TokenModel
+                {
+                    AccessToken = newAccessToken,
+                    RefreshToken = newRefreshToken
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
     }
 }

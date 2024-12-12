@@ -15,27 +15,19 @@ namespace AuthApi.Services
         private const string KEY = "mysupersecret_secretsecretsecretkey!123";
         private const string ISS = "AuthApi";
         private const string AUD = "ApiGateway";
-        private const int EXP = 5; // In minutes
+        private const int EXP = 1; // In minutes
 
         private static SymmetricSecurityKey GetSymmetricSecurityKey() =>
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(KEY));
 
-        public string GenerateToken(User user)
+        public string GenerateToken(List<Claim> claims)
         {
-            // Add other payload information
-            var claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub,  user.Id),
-                new Claim(JwtRegisteredClaimNames.Name, user.Name),
-                new Claim(ClaimTypes.Role, user.Role.ToString()),
-            };
-
             // Build token
             var jwtToken = new JwtSecurityToken(
                 issuer: ISS,
                 audience: AUD,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(EXP),
+                expires: DateTimeOffset.UtcNow.AddMinutes(EXP).ToUnixTimeSeconds(), // TODO: rebuild to unix
                 signingCredentials: new SigningCredentials(
                     GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
 
@@ -50,6 +42,37 @@ namespace AuthApi.Services
                 rng.GetBytes(randomNumber);
                 return Convert.ToHexString(randomNumber);
             }
+        }
+
+        public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        {
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = ISS,
+                ValidateAudience = true,
+                ValidAudience = AUD,
+                ValidateLifetime = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = GetSymmetricSecurityKey()
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            // If validation param are met return security token and claims
+            var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+
+            // Try convert to jwt
+            var jwtToken = validatedToken as JwtSecurityToken;
+
+            // Token is wrong if is not jwt or not same alg
+            if (jwtToken == null || !jwtToken.Header.Alg.Equals(
+                SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            {
+                throw new SecurityTokenException("Invalid token.");
+            }
+
+            return principal;
         }
     }
 }
