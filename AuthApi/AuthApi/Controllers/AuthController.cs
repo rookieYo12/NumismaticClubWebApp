@@ -70,8 +70,7 @@ namespace AuthApi.Controllers
             // If authentication is successful get payload information
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub,  user.Id),
-                new Claim(JwtRegisteredClaimNames.Name, user.Name),
+                new Claim(ClaimTypes.Name, user.Name),
                 new Claim(ClaimTypes.Role, user.Role.ToString()),
             };
 
@@ -81,7 +80,7 @@ namespace AuthApi.Controllers
 
             // Update user
             user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.Add(TimeSpan.FromMinutes(3));
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddMinutes(2);
             
             await _userService.UpdateAsync(user.Name, user);
 
@@ -107,6 +106,7 @@ namespace AuthApi.Controllers
                 // Check access token
                 var principal = _tokenService.GetPrincipalFromExpiredToken(refreshRequest.AccessToken);
 
+                // TODO: Name is null, contains in claims
                 var user = await _userService.GetAsync(principal.Identity.Name);
 
                 if (user == null)

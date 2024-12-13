@@ -30,9 +30,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidAudience = authOptions.Audience,
             ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(authOptions.Key)),
-            ValidateIssuerSigningKey = true,
+            // Set zero for using exp time < 5 minutes
+            ClockSkew = TimeSpan.Zero 
+
         };
     });
 

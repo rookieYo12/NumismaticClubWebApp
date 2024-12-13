@@ -27,7 +27,7 @@ namespace AuthApi.Services
                 issuer: ISS,
                 audience: AUD,
                 claims: claims,
-                expires: DateTimeOffset.UtcNow.AddMinutes(EXP).ToUnixTimeSeconds(), // TODO: rebuild to unix
+                expires: DateTime.UtcNow.AddMinutes(EXP),
                 signingCredentials: new SigningCredentials(
                     GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
 
