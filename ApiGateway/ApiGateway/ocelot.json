@@ -19,9 +19,21 @@
       "DownstreamPathTemplate": "/api/auth/{everything}"
     },
     {
-      "UpstreamPathTemplate": "/coins",
-      "UpstreamHttpMethod": [ "Get", "Post" ],
+      "UpstreamPathTemplate": "/coins/{everything}",
+      "UpstreamHttpMethod": [ "Get" ],
 
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5163
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Coins/{everything}"
+    },
+    {
+      "UpstreamPathTemplate": "/coins",
+      "UpstreamHttpMethod": [ "Post" ],
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
@@ -31,8 +43,10 @@
       ],
       "DownstreamPathTemplate": "/api/Coins",
       "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
+        "AuthenticationProviderKey": "Bearer"
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "User"
       }
     }
   ]
