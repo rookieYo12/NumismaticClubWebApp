@@ -23,13 +23,13 @@ namespace AuthApi.Controllers
         [HttpPost("signup")]
         public async Task<IActionResult> SignUp(AuthRequest authRequest)
         {
-            if (string.IsNullOrWhiteSpace(authRequest.Name) ||
+            if (string.IsNullOrWhiteSpace(authRequest.Login) ||
                 string.IsNullOrWhiteSpace(authRequest.Password))
             {
                 return BadRequest("Wrong fields.");
             }
 
-            if (await _userService.GetAsync(authRequest.Name) != null)
+            if (await _userService.GetAsync(authRequest.Login) != null)
             {
                 return BadRequest("User with this login already exists.");
             }
@@ -37,7 +37,7 @@ namespace AuthApi.Controllers
             await _userService.CreateAsync(new User
             {
                 Id = "",
-                Name = authRequest.Name,
+                Login = authRequest.Login,
                 Password = authRequest.Password,
                 Role = UserRole.User
             });
@@ -49,13 +49,13 @@ namespace AuthApi.Controllers
         public async Task<IActionResult> SignIn(AuthRequest authRequest)
         {
             // Trying to recognize the user
-            if (string.IsNullOrWhiteSpace(authRequest.Name) || 
+            if (string.IsNullOrWhiteSpace(authRequest.Login) || 
                 string.IsNullOrWhiteSpace(authRequest.Password))
             {
                 return BadRequest("Wrong fields.");
             }
             
-            var user = await _userService.GetAsync(authRequest.Name);
+            var user = await _userService.GetAsync(authRequest.Login);
 
             if (user == null)
             {
@@ -70,7 +70,8 @@ namespace AuthApi.Controllers
             // If authentication is successful get payload information
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Name),
+                // TODO: use another claim keys
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Role, user.Role.ToString()),
             };
 
@@ -82,7 +83,7 @@ namespace AuthApi.Controllers
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddMinutes(2);
             
-            await _userService.UpdateAsync(user.Name, user);
+            await _userService.UpdateAsync(user.Login, user);
 
             return Ok(new TokenModel
             {
@@ -106,7 +107,7 @@ namespace AuthApi.Controllers
                 // Check access token
                 var principal = _tokenService.GetPrincipalFromExpiredToken(refreshRequest.AccessToken);
 
-                // TODO: Name is null, contains in claims
+                // TODO: Name is null, contains in claims ???
                 var user = await _userService.GetAsync(principal.Identity.Name);
 
                 if (user == null)
@@ -127,7 +128,7 @@ namespace AuthApi.Controllers
 
                 // Update user
                 user.RefreshToken = newRefreshToken;
-                await _userService.UpdateAsync(user.Name, user);
+                await _userService.UpdateAsync(user.Login, user);
 
                 // TODO: cookie?
 

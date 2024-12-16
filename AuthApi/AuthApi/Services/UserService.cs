@@ -22,15 +22,15 @@ namespace AuthApi.Services
         }
 
         // Get user by username
-        public async Task<User?> GetAsync(string name) =>
-            await _usersCollection.Find(x => x.Name == name).FirstOrDefaultAsync();
+        public async Task<User?> GetAsync(string login) =>
+            await _usersCollection.Find(x => x.Login == login).FirstOrDefaultAsync();
 
         // Insert a new user
         public async Task CreateAsync(User newUser) =>
             await _usersCollection.InsertOneAsync(newUser);
 
         // Update by name
-        public async Task UpdateAsync(string name, User updatedUser) =>
-            await _usersCollection.ReplaceOneAsync(x => x.Name == name, updatedUser);
+        public async Task UpdateAsync(string login, User updatedUser) =>
+            await _usersCollection.ReplaceOneAsync(x => x.Login == login, updatedUser);
     }
 }

@@ -21,6 +21,8 @@ namespace NumismaticClub.Controllers
             _producer = producer;
         }
 
+        /*
+
         // Генерация случайных данных для монет
         private List<Coin> GenerateRandomCoins(int count, string UserId)
         {
@@ -34,7 +36,6 @@ namespace NumismaticClub.Controllers
                     Year = random.Next(1800, 2024),
                     Country = $"Country {i}",
                     Value = random.Next(1, 1000),
-                    UserId = UserId,
                 });
             }
             return coins;
@@ -62,6 +63,8 @@ namespace NumismaticClub.Controllers
 
             return Ok(new { message = "100 монет успешно добавлены в базу данных." });
         }
+
+        */
 
         /* Long time
 

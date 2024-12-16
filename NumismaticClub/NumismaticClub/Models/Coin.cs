@@ -15,13 +15,18 @@ namespace NumismaticClub.Models
 
         public int Value { get; set; }
 
-        public string UserId { get; set; } = null!;
+        public string? UserId { get; private set; }
 
         public string Confirmed { get; private set; } = "Not confirmed.";
 
         public void setConfirmed(string value)
         {
             Confirmed = value;
+        }
+
+        public void setUserId(string value)
+        {
+            UserId = value;
         }
     }
 }

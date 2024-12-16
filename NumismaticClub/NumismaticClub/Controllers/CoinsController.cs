@@ -3,6 +3,8 @@ using NumismaticClub.Services;
 using NumismaticClub.Models;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Text.Json;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NumismaticClub.Controllers
 {
@@ -62,6 +64,11 @@ namespace NumismaticClub.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(Coin newCoin)
         {
+            var userId = Request.Headers["UserId"].ToString(); // This is good
+
+            // TODO: user auth is false
+            newCoin.setUserId(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            
             await _coinsService.CreateAsync(newCoin);
 
             Request request = new Request

@@ -15,7 +15,7 @@ namespace AuthApi.Services
         private const string KEY = "mysupersecret_secretsecretsecretkey!123";
         private const string ISS = "AuthApi";
         private const string AUD = "ApiGateway";
-        private const int EXP = 1; // In minutes
+        private const int EXP = 15; // In minutes
 
         private static SymmetricSecurityKey GetSymmetricSecurityKey() =>
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(KEY));
