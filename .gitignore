@@ -7,7 +7,6 @@
 CoinsDb/
 UsersDb/
 AuthDb/
-startDbs.bat
 
 # dotenv files
 .env

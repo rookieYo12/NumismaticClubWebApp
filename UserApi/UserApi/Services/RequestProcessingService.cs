@@ -16,17 +16,29 @@ namespace UserApi.Services
             _producerService = producerService;
         }
 
-        public async Task Process(string message)
+        public async Task CreateUser(string messageValue)
         {
-            var request = JsonSerializer.Deserialize<Request>(message);
+            var userId = JsonSerializer.Deserialize<string>(messageValue);
+
+            await _usersService.CreateAsync(new User
+            {
+                Id = userId,
+                Name = "User",
+                Surname = $"{userId}"
+            });
+        }
+
+        public async Task UpdateRegisteredObjects(string messageValue)
+        {
+            var request = JsonSerializer.Deserialize<Request>(messageValue);
 
             // Fetch user from db
             var user = await _usersService.GetAsync(request.UserId);
 
             if (user == null)
             {
-                Console.WriteLine($"User with ID {request.UserId} not found.");
-                return;
+                _producerService.Produce("update-user-topic", messageValue); // Return to queue
+                throw new Exception("User not found.");
             }
 
             user.IncremetRegisteredObjects();
@@ -44,7 +56,7 @@ namespace UserApi.Services
                 UpdateTime = updateTime
             });
 
-            _producerService.Produce(response);
+            _producerService.Produce("coin-topic", response);
         }
     }
 }

@@ -64,10 +64,9 @@ namespace NumismaticClub.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(Coin newCoin)
         {
-            var userId = Request.Headers["UserId"].ToString(); // This is good
+            var userId = Request.Headers["UserId"].ToString(); // Get user id from header
 
-            // TODO: user auth is false
-            newCoin.setUserId(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            newCoin.setUserId(userId);
             
             await _coinsService.CreateAsync(newCoin);
 
@@ -77,8 +76,8 @@ namespace NumismaticClub.Controllers
                 CoinId = newCoin.Id
             };
 
-            // Send request to another service
-            // _producer.Produce(JsonSerializer.Serialize(request));
+            // Send request to user service for data update 
+            _producer.Produce("update-user-topic", JsonSerializer.Serialize(request));
 
             return CreatedAtAction(nameof(Get), new { id = newCoin.Id }, newCoin);
         }

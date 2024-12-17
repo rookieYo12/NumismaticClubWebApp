@@ -17,9 +17,9 @@ namespace UserApi.Services
             _producer = new ProducerBuilder<Null, string>(config).Build();
         }
 
-        public void Produce(string value)
+        public void Produce(string topicName, string value)
         {
-            _producer.Produce("coin-topic", new Message<Null, string> { 
+            _producer.Produce(topicName, new Message<Null, string> { 
                 Value = value
             });
         }

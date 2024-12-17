@@ -1,4 +1,5 @@
 ﻿using Confluent.Kafka;
+using UserApi.Services;
 
 namespace UserApi.Services
 {
@@ -7,8 +8,9 @@ namespace UserApi.Services
     {
         private readonly IConsumer<Ignore, string> _consumer;
         private readonly RequestProcessingService _requestProcessingService;
+        private readonly UsersService _usersService;
 
-        public ConsumerService(RequestProcessingService requestProcessingService)
+        public ConsumerService(RequestProcessingService requestProcessingService, UsersService usersService)
         {
             var config = new ConsumerConfig
             {
@@ -19,6 +21,7 @@ namespace UserApi.Services
 
             _consumer = new ConsumerBuilder<Ignore, string>(config).Build();
             _requestProcessingService = requestProcessingService;
+            _usersService = usersService;
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -28,17 +31,25 @@ namespace UserApi.Services
 
         private async Task StartConsumerLoop(CancellationToken cancellationToken)
         {
-            _consumer.Subscribe("user-topic");
+            _consumer.Subscribe(["create-user-topic", "update-user-topic"]);
 
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
                 {
-                    var consumeResult = _consumer.Consume(cancellationToken).Message.Value;
+                    var consumeResult = _consumer.Consume(cancellationToken);
+                    var messageValue = consumeResult.Message.Value;
 
-                    if (!string.IsNullOrWhiteSpace(consumeResult))
+                    if (!string.IsNullOrWhiteSpace(messageValue))
                     {
-                        await _requestProcessingService.Process(consumeResult);
+                        if (consumeResult.Topic == "create-user-topic")
+                        {
+                            await _requestProcessingService.CreateUser(messageValue);
+                        }
+                        else if (consumeResult.Topic == "update-user-topic")
+                        {
+                            await _requestProcessingService.UpdateRegisteredObjects(messageValue);
+                        }
                     }
                 }
                 catch (OperationCanceledException) // When a cancel signal is received 
@@ -53,6 +64,10 @@ namespace UserApi.Services
                     {
                         break;
                     }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
                 }
             }
         }
