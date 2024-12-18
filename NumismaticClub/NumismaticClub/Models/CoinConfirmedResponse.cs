@@ -1,6 +1,6 @@
 ﻿namespace NumismaticClub.Models
 {
-    public class Response
+    public class CoinConfirmedResponse
     {
         public string CoinId { get; set; } = null!;
 

@@ -31,7 +31,7 @@ namespace UserApi.Services
 
         private async Task StartConsumerLoop(CancellationToken cancellationToken)
         {
-            _consumer.Subscribe(["create-user-topic", "update-user-topic"]);
+            _consumer.Subscribe(["user-created", "user-deleted", "coin-created", "coin-deleted"]);
 
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -42,13 +42,22 @@ namespace UserApi.Services
 
                     if (!string.IsNullOrWhiteSpace(messageValue))
                     {
-                        if (consumeResult.Topic == "create-user-topic")
+                        switch (consumeResult.Topic)
                         {
-                            await _requestProcessingService.CreateUser(messageValue);
-                        }
-                        else if (consumeResult.Topic == "update-user-topic")
-                        {
-                            await _requestProcessingService.UpdateRegisteredObjects(messageValue);
+                            case "user-created":
+                                await _requestProcessingService.CreateUser(messageValue);
+                                break;
+                            case "user-deleted":
+                                await _requestProcessingService.DeleteUser(messageValue);
+                                break;
+                            case "coin-created":
+                                await _requestProcessingService.AddRegisteredObject(messageValue);
+                                break;
+                            case "coin-deleted":
+                                await _requestProcessingService.DeleteRegisteredObject(messageValue);
+                                break;
+                            default:
+                                break;
                         }
                     }
                 }

@@ -70,14 +70,14 @@ namespace NumismaticClub.Controllers
             
             await _coinsService.CreateAsync(newCoin);
 
-            Request request = new Request
+            CoinCreatedRequest request = new CoinCreatedRequest
             {
                 UserId = newCoin.UserId,
                 CoinId = newCoin.Id
             };
 
             // Send request to user service for data update 
-            _producer.Produce("update-user-topic", JsonSerializer.Serialize(request));
+            _producer.Produce("coin-created", JsonSerializer.Serialize(request));
 
             return CreatedAtAction(nameof(Get), new { id = newCoin.Id }, newCoin);
         }
@@ -95,8 +95,24 @@ namespace NumismaticClub.Controllers
             {
                 return NotFound();
             }
+
+            var roles = Request.Headers["Roles"].ToString().Split(',');
             
-            // If find coin in db update it
+            if (!roles.Contains("Admin"))
+            {
+                // Сheck that the owner is trying to update
+                var userId = Request.Headers["UserId"].ToString();
+
+                if (userId != coin.UserId)
+                {
+                    return BadRequest("User with the role 'User' cannot modify objects of other users.");
+                }
+            }
+
+            // Copy some data from old coin
+            updatedCoin.setUserId(coin.UserId);
+            updatedCoin.setConfirmed(coin.Confirmed);
+
             await _coinsService.UpdateAsync(id, updatedCoin);
 
             // Cache new data          
@@ -120,11 +136,28 @@ namespace NumismaticClub.Controllers
                 return NotFound();
             }
 
+            var roles = Request.Headers["Roles"].ToString().Split(',');
+
+            if (!roles.Contains("Admin"))
+            {
+                // Сheck that the owner is trying to delete
+                var userId = Request.Headers["UserId"].ToString();
+
+                if (userId != coin.UserId)
+                {
+                    return BadRequest("User with the role 'User' cannot delete objects of other users.");
+                }
+            }
+
+            var coinOwnerId = coin.UserId;
+
             await _coinsService.RemoveAsync(id); // Delete data from db
 
             // Remove data from cache
             var cacheKey = $"Coin_{id}";
             await _cache.RemoveAsync(cacheKey);
+
+            _producer.Produce("coin-deleted", JsonSerializer.Serialize(coinOwnerId));
 
             return NoContent();
         }

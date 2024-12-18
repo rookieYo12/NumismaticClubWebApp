@@ -21,16 +21,24 @@ namespace AuthApi.Services
                 dbSettings.Value.UsersCollectionName);
         }
 
-        // Get user by username
-        public async Task<User?> GetAsync(string login) =>
+        // Get user by login
+        public async Task<User?> GetByLoginAsync(string login) =>
             await _usersCollection.Find(x => x.Login == login).FirstOrDefaultAsync();
+
+        // Get user by id
+        public async Task<User?> GetByIdAsync(string id) =>
+            await _usersCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
 
         // Insert a new user
         public async Task CreateAsync(User newUser) =>
             await _usersCollection.InsertOneAsync(newUser);
 
-        // Update by name
+        // Update by login
         public async Task UpdateAsync(string login, User updatedUser) =>
             await _usersCollection.ReplaceOneAsync(x => x.Login == login, updatedUser);
+
+        // Delete by id
+        public async Task DeleteAsync(string id) =>
+            await _usersCollection.DeleteOneAsync(x => x.Id == id);
     }
 }

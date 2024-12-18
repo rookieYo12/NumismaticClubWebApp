@@ -19,5 +19,10 @@ namespace UserApi.Models
         {
             RegisteredObjects++;
         }
+
+        public void DeincrementRegisteredObjects()
+        {
+            RegisteredObjects--;
+        }
     }
 }

@@ -3,6 +3,7 @@
     "BaseUrl": "http://localhost:5290" // Gateway url
   },
   "Routes": [
+    // -------------- To auth service --------------
     {
       // To gateway
       "UpstreamPathTemplate": "/auth/{everything}",
@@ -47,10 +48,32 @@
         "AuthenticationProviderKey": "Bearer"
       },
       "RouteClaimsRequirement": {
-        "role": "User"
+        "Roles": "User"
       },
       "AddHeadersToRequest": {
-        "UserId": "Claims[sub] > value[0] > |"
+        "UserId": "Claims[Sub] > value[0] > |"
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/coins/{id}",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5163
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Coins/{id}",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      },
+      "RouteClaimsRequirement": {
+        "Roles": "User"
+      },
+      "AddHeadersToRequest": {
+        "UserId": "Claims[Sub] > value",
+        "Roles": "Claims[Roles] > value"
       }
     },
 
@@ -71,7 +94,7 @@
         "AllowedScopes": []
       },
       "RouteClaimsRequirement": {
-        "Role": "User"
+        "Roles": "User"
       }
     }
   ]

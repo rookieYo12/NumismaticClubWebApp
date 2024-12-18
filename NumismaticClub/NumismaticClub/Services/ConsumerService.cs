@@ -29,7 +29,7 @@ namespace NumismaticClub.Services
 
         private async Task StartConsumerLoop(CancellationToken cancellationToken)
         {
-            _consumer.Subscribe("coin-topic");
+            _consumer.Subscribe("coin-confirmed");
 
             while (!cancellationToken.IsCancellationRequested)
             {

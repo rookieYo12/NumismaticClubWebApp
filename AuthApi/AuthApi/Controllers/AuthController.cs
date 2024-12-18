@@ -33,7 +33,7 @@ namespace AuthApi.Controllers
                 return BadRequest("Wrong fields.");
             }
 
-            if (await _userService.GetAsync(authRequest.Login) != null)
+            if (await _userService.GetByLoginAsync(authRequest.Login) != null)
             {
                 return BadRequest("User with this login already exists.");
             }
@@ -48,7 +48,7 @@ namespace AuthApi.Controllers
 
             await _userService.CreateAsync(newUser);
 
-            _producer.Produce("create-user-topic", JsonSerializer.Serialize(newUser.Id));
+            _producer.Produce("user-created", JsonSerializer.Serialize(newUser.Id));
 
             return StatusCode(201); // Created
         }
@@ -63,7 +63,7 @@ namespace AuthApi.Controllers
                 return BadRequest("Wrong fields.");
             }
             
-            var user = await _userService.GetAsync(authRequest.Login);
+            var user = await _userService.GetByLoginAsync(authRequest.Login);
 
             if (user == null)
             {
@@ -78,11 +78,11 @@ namespace AuthApi.Controllers
             // If authentication is successful get payload information
             var claims = new List<Claim>
             {
-                new Claim("sub", user.Id)
+                new Claim("Sub", user.Id)
             };    
             foreach (var role in user.Roles)
             {
-                claims.Add(new Claim("Role", role.ToString()));
+                claims.Add(new Claim("Roles", role.ToString()));
             }
 
             // Generate tokens
@@ -117,8 +117,8 @@ namespace AuthApi.Controllers
                 // Check access token
                 var principal = _tokenService.GetPrincipalFromExpiredToken(refreshRequest.AccessToken);
 
-                // TODO: Name is null, contains in claims ???
-                var user = await _userService.GetAsync(principal.Identity.Name);
+                // TODO: get id from old token
+                var user = await _userService.GetByIdAsync(principal.Identity.Name);
 
                 if (user == null)
                 {
@@ -152,6 +152,36 @@ namespace AuthApi.Controllers
             {
                 return BadRequest(ex);
             }
+        }
+
+        [HttpDelete]
+        [Route("delete")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var roles = Request.Headers["Roles"].ToString().Split(',');
+
+            if (!roles.Contains("Admin"))
+            {
+                // Сheck that the user trying to delete own account
+                var userId = Request.Headers["UserId"].ToString();
+
+                if (userId != id)
+                {
+                    return BadRequest("User with the role 'User' cannot delete other users.");
+                }
+            }
+
+            var user = await _userService.GetByIdAsync(id);
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            await _userService.DeleteAsync(id);
+
+            _producer.Produce("user-deleted", JsonSerializer.Serialize(id));
+
+            return NoContent();
         }
     }
 }

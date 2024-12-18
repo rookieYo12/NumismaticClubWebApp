@@ -1,6 +1,6 @@
 ﻿namespace NumismaticClub.Models
 { 
-    public class Request
+    public class CoinCreatedRequest
     {
         public string UserId { get; set; } = null!;
 

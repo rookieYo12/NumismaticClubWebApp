@@ -16,7 +16,7 @@ namespace NumismaticClub.Services
 
         public async Task Process(string message)
         {
-            var response = JsonSerializer.Deserialize<Response>(message);
+            var response = JsonSerializer.Deserialize<CoinConfirmedResponse>(message);
 
             // Fetch coin from db
             var coin = await _coinsService.GetAsync(response.CoinId);

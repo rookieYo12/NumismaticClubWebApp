@@ -28,16 +28,23 @@ namespace UserApi.Services
             });
         }
 
-        public async Task UpdateRegisteredObjects(string messageValue)
+        public async Task DeleteUser(string messageValue)
         {
-            var request = JsonSerializer.Deserialize<Request>(messageValue);
+            var userId = JsonSerializer.Deserialize<string>(messageValue);
+
+            await _usersService.RemoveAsync(userId); // Delete data from db
+        }
+
+        public async Task AddRegisteredObject(string messageValue)
+        {
+            var request = JsonSerializer.Deserialize<CoinCreatedRequest>(messageValue);
 
             // Fetch user from db
             var user = await _usersService.GetAsync(request.UserId);
 
             if (user == null)
             {
-                _producerService.Produce("update-user-topic", messageValue); // Return to queue
+                _producerService.Produce("coin-created", messageValue); // Return to queue
                 throw new Exception("User not found.");
             }
 
@@ -50,13 +57,32 @@ namespace UserApi.Services
             DateTimeOffset now = DateTimeOffset.Now;
             string updateTime = now.ToString();
 
-            var response = JsonSerializer.Serialize(new Response
+            var response = JsonSerializer.Serialize(new CoinConfirmedResponse
             {
                 CoinId = request.CoinId,
                 UpdateTime = updateTime
             });
 
-            _producerService.Produce("coin-topic", response);
+            _producerService.Produce("coin-confirmed", response);
+        }
+
+        public async Task DeleteRegisteredObject(string messageValue)
+        {
+            var request = JsonSerializer.Deserialize<CoinCreatedRequest>(messageValue);
+
+            // Fetch user from db
+            var user = await _usersService.GetAsync(request.UserId);
+
+            if (user == null)
+            {
+                _producerService.Produce("coin-deleted", messageValue); // Return to queue
+                throw new Exception("User not found.");
+            }
+
+            user.DeincrementRegisteredObjects();
+
+            // Update user in db
+            await _usersService.UpdateAsync(request.UserId, user);
         }
     }
 }
