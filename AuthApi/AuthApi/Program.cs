@@ -13,6 +13,8 @@ builder.Services.AddSingleton<UserService>();
 // Service for jwt tokens
 builder.Services.AddSingleton<TokenService>();
 
+builder.Services.AddSingleton<ProducerService>();
+
 builder.Services.AddControllers();
 
 var app = builder.Build();

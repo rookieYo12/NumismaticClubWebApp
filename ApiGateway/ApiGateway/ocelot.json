@@ -7,7 +7,7 @@
       // To gateway
       "UpstreamPathTemplate": "/auth/{everything}",
       "UpstreamHttpMethod": [ "Post" ],
-      
+
       // From gateway
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -18,10 +18,11 @@
       ],
       "DownstreamPathTemplate": "/api/auth/{everything}"
     },
+
+    // -------------- To coin service --------------
     {
       "UpstreamPathTemplate": "/coins/{everything}",
       "UpstreamHttpMethod": [ "Get" ],
-
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
@@ -46,10 +47,31 @@
         "AuthenticationProviderKey": "Bearer"
       },
       "RouteClaimsRequirement": {
-        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "User"
+        "role": "User"
       },
       "AddHeadersToRequest": {
-        "UserId": "Claims[http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier] > value[0] > |"
+        "UserId": "Claims[sub] > value[0] > |"
+      }
+    },
+
+    // -------------- To user service --------------
+    {
+      "UpstreamPathTemplate": "/users/{everything}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5218
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Users/{everything}",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "RouteClaimsRequirement": {
+        "Role": "User"
       }
     }
   ]

@@ -13,7 +13,7 @@ namespace AuthApi.Models
 
         public string Password { get; set; } = null!;
 
-        public UserRole Role { get; set; }
+        public List<UserRole> Roles { get; set; } = null!;
 
         public string RefreshToken { get; set; } = null!;
 

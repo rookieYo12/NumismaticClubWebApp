@@ -4,6 +4,7 @@ using AuthApi.Services;
 using System.CodeDom.Compiler;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
+using System.Text.Json;
 
 namespace AuthApi.Controllers
 {
@@ -13,11 +14,14 @@ namespace AuthApi.Controllers
     {
         private readonly UserService _userService;
         private readonly TokenService _tokenService;
+        private readonly ProducerService _producer;
 
-        public AuthController(UserService usersService, TokenService tokenService)
+        public AuthController(UserService usersService, TokenService tokenService,
+            ProducerService producer)
         {
             _userService = usersService;
             _tokenService = tokenService;
+            _producer = producer;
         }
 
         [HttpPost("signup")]
@@ -34,13 +38,17 @@ namespace AuthApi.Controllers
                 return BadRequest("User with this login already exists.");
             }
 
-            await _userService.CreateAsync(new User
+            var newUser = new User
             {
                 Id = "",
                 Login = authRequest.Login,
                 Password = authRequest.Password,
-                Role = UserRole.User
-            });
+            };
+            newUser.Roles = [UserRole.User];
+
+            await _userService.CreateAsync(newUser);
+
+            _producer.Produce("create-user-topic", JsonSerializer.Serialize(newUser.Id));
 
             return StatusCode(201); // Created
         }
@@ -70,10 +78,12 @@ namespace AuthApi.Controllers
             // If authentication is successful get payload information
             var claims = new List<Claim>
             {
-                // TODO: use another claim keys
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Role, user.Role.ToString()),
-            };
+                new Claim("sub", user.Id)
+            };    
+            foreach (var role in user.Roles)
+            {
+                claims.Add(new Claim("Role", role.ToString()));
+            }
 
             // Generate tokens
             var accessToken = _tokenService.GenerateToken(claims);
