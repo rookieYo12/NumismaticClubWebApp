@@ -25,7 +25,7 @@ namespace AuthApi.Controllers
         }
 
         [HttpPost("signup")]
-        public async Task<IActionResult> SignUp(AuthRequest authRequest)
+        public async Task<IActionResult> SignUp(AuthInfo authRequest)
         {
             if (string.IsNullOrWhiteSpace(authRequest.Login) ||
                 string.IsNullOrWhiteSpace(authRequest.Password))
@@ -54,7 +54,7 @@ namespace AuthApi.Controllers
         }
 
         [HttpPost("signin")]
-        public async Task<IActionResult> SignIn(AuthRequest authRequest)
+        public async Task<IActionResult> SignIn(AuthInfo authRequest)
         {
             // Trying to recognize the user
             if (string.IsNullOrWhiteSpace(authRequest.Login) || 
@@ -114,11 +114,14 @@ namespace AuthApi.Controllers
 
             try
             {
-                // Check access token
+                // Check access token and get principals from it
                 var principal = _tokenService.GetPrincipalFromExpiredToken(refreshRequest.AccessToken);
 
-                // TODO: get id from old token
-                var user = await _userService.GetByIdAsync(principal.Identity.Name);
+                // Get id from principal
+                var userId = principal.Claims.FirstOrDefault(c => c.Type == "Sub").Value;
+
+                // Get user by id
+                var user = await _userService.GetByIdAsync(userId);
 
                 if (user == null)
                 {
@@ -154,8 +157,27 @@ namespace AuthApi.Controllers
             }
         }
 
-        [HttpDelete]
-        [Route("delete")]
+        [HttpPut("update-auth/{id:length(24)}")]
+        public async Task<IActionResult> Update(string id, AuthInfo newInfo)
+        {
+            var userId = Request.Headers["UserId"].ToString();
+
+            // Check that owner trying to change auth data
+            if (userId != id)
+            {
+                return BadRequest("You cannot change auth data other users.");
+            }
+
+            var user = await _userService.GetByIdAsync(id);
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            // TODO: other logic...
+        }
+
+        [HttpDelete("delete/{id:length(24)}")]
         public async Task<IActionResult> Delete(string id)
         {
             var roles = Request.Headers["Roles"].ToString().Split(',');

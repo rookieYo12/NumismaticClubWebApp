@@ -68,10 +68,10 @@ namespace UserApi.Services
 
         public async Task DeleteRegisteredObject(string messageValue)
         {
-            var request = JsonSerializer.Deserialize<CoinCreatedRequest>(messageValue);
+            var userId = JsonSerializer.Deserialize<string>(messageValue);
 
             // Fetch user from db
-            var user = await _usersService.GetAsync(request.UserId);
+            var user = await _usersService.GetAsync(userId);
 
             if (user == null)
             {
@@ -82,7 +82,7 @@ namespace UserApi.Services
             user.DeincrementRegisteredObjects();
 
             // Update user in db
-            await _usersService.UpdateAsync(request.UserId, user);
+            await _usersService.UpdateAsync(userId, user);
         }
     }
 }

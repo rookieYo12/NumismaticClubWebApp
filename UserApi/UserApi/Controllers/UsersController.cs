@@ -33,14 +33,7 @@ namespace UserApi.Controllers
             return Ok(user);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Post(User newUser)
-        {
-            await _usersService.CreateAsync(newUser);
-
-            return CreatedAtAction(nameof(Get), new { id = newUser.Id }, newUser);
-        }
-
+        // TODO: change it
         [HttpPut("{id:length(24)}")]
         public async Task<IActionResult> Update(string id, User updatedUser)
         {
@@ -57,20 +50,6 @@ namespace UserApi.Controllers
 
             // If find coin in db update it
             await _usersService.UpdateAsync(id, updatedUser);
-
-            return NoContent();
-        }
-
-        [HttpDelete("{id:length(24)}")]
-        public async Task<IActionResult> Delete(string id)
-        {
-            var user = await _usersService.GetAsync(id);
-            if (user is null)
-            {
-                return NotFound();
-            }
-
-            await _usersService.RemoveAsync(id); // Delete data from db
 
             return NoContent();
         }

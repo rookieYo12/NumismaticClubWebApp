@@ -19,6 +19,28 @@
       ],
       "DownstreamPathTemplate": "/api/auth/{everything}"
     },
+    {
+      "UpstreamPathTemplate": "/auth/{everything}/{id}",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5043
+        }
+      ],
+      "DownstreamPathTemplate": "/api/auth/{everything}/{id}",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      },
+      "RouteClaimsRequirement": {
+        "Roles": "User"
+      },
+      "AddHeadersToRequest": {
+        "UserId": "Claims[Sub] > value",
+        "Roles": "Claims[Roles] > value"
+      }
+    },
 
     // -------------- To coin service --------------
     {
@@ -51,12 +73,12 @@
         "Roles": "User"
       },
       "AddHeadersToRequest": {
-        "UserId": "Claims[Sub] > value[0] > |"
+        "UserId": "Claims[Sub] > value"
       }
     },
     {
       "UpstreamPathTemplate": "/coins/{id}",
-      "UpstreamHttpMethod": [ "Put" ],
+      "UpstreamHttpMethod": [ "Put", "Delete" ],
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
@@ -76,7 +98,6 @@
         "Roles": "Claims[Roles] > value"
       }
     },
-
     // -------------- To user service --------------
     {
       "UpstreamPathTemplate": "/users/{everything}",
