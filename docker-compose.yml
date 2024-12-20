@@ -7,6 +7,8 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - net
 
   kafka:
     container_name: kafka
@@ -18,25 +20,125 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - net
+
+  gateway:
+    image: apigateway
+    build:
+      context: .
+      dockerfile: ./NumismaticClub/ApiGateway/Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - net
+    depends_on:
+      - auth
+      - user
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://+:8080"
+
+  auth:
+    image: authapi
+    build:
+      context: .
+      dockerfile: ./NumismaticClub/AuthApi/Dockerfile
+    ports:
+      - "8081:8081"
+    networks:
+      - net
+    depends_on:
+      - mongo_auth
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://+:8081"
+
+  mongo_auth:
+    image: mongo
+    container_name: mongo_auth
+    volumes:
+      - mongo-auth-data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - net
+
+  user:
+    image: userapi
+    build:
+      context: .
+      dockerfile: ./NumismaticClub/UserApi/Dockerfile
+    ports:
+      - "8082:8082"
+    networks:
+      - net
+    depends_on:
+      - mongo_user
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://+:8082"
+
+  mongo_user:
+    image: mongo
+    container_name: mongo_user
+    volumes:
+      - mongo-user-data:/data/db
+    ports:
+      - "27018:27017"
+    networks:
+      - net
+
+  coin:
+    image: numismaticclub
+    build:
+      context: .
+      dockerfile: ./NumismaticClub/NumismaticClub/Dockerfile
+    ports:
+      - "8083:8083"
+    networks:
+      - net
+    depends_on:
+      - mongo_coin
+      - redis
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://+:8083"
   
-  # kafka-ui:
-  #   container_name: kafka-ui
-  #   image: provectuslabs/kafka-ui:latest
-  #   ports:
-  #     - 8080:8080
-  #   environment:
-  #     DYNAMIC_CONFIG_ENABLED: true
+  mongo_coin:
+    image: mongo
+    container_name: mongo_coin
+    volumes:
+      - mongo-coin-data:/data/db
+    ports:
+      - "27019:27017"
+    networks:
+      - net
+  
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - net
+    volumes:
+      - redis-data:/data
+    restart: always
+  
+networks:
+  net:
+    driver: bridge
 
-
-  # Docker?
-  # mongodb:
-  #   image: mongo
-  #   container_name: mongodb
-  #   restart: always
-  #   ports:
-  #     - "27017:27017"
-  #   environment:
-
+volumes:
+  mongo-auth-data:
+    driver: local
+  mongo-user-data:
+    driver: local
+  mongo-coin-data:
+    driver: local
+  redis-data:
+    driver: local

@@ -1,6 +1,6 @@
 {
   "GlobalConfiguration": {
-    "BaseUrl": "http://localhost:5290" // Gateway url
+    "BaseUrl": "http://localhost:8080" // Gateway url
   },
   "Routes": [
     // -------------- To auth service --------------
@@ -8,13 +8,12 @@
       // To gateway
       "UpstreamPathTemplate": "/auth/{everything}",
       "UpstreamHttpMethod": [ "Post" ],
-
       // From gateway
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5043
+          "Host": "auth",
+          "Port": 8081
         }
       ],
       "DownstreamPathTemplate": "/api/auth/{everything}"
@@ -25,8 +24,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5043
+          "Host": "auth",
+          "Port": 8081
         }
       ],
       "DownstreamPathTemplate": "/api/auth/{id}/edit-role",
@@ -43,8 +42,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5043
+          "Host": "auth",
+          "Port": 8081
         }
       ],
       "DownstreamPathTemplate": "/api/auth/{id}/{everything}",
@@ -59,7 +58,6 @@
         "Roles": "Claims[Roles] > value"
       }
     },
-
     // -------------- To coin service --------------
     {
       "UpstreamPathTemplate": "/coins/{everything}",
@@ -67,8 +65,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5163
+          "Host": "coin",
+          "Port": 8083
         }
       ],
       "DownstreamPathTemplate": "/api/Coins/{everything}"
@@ -79,8 +77,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5163
+          "Host": "coin",
+          "Port": 8083
         }
       ],
       "DownstreamPathTemplate": "/api/Coins",
@@ -100,8 +98,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5163
+          "Host": "coin",
+          "Port": 8083
         }
       ],
       "DownstreamPathTemplate": "/api/Coins/{id}",
@@ -118,13 +116,32 @@
     },
     // -------------- To user service --------------
     {
+      "UpstreamPathTemplate": "/users/my-profile",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "user",
+          "Port": 8082
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Users/{userId}",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "ChangeDownstreamPathTemplate": {
+        "userId": "Claims[Sub] > value"
+      }
+    },
+    {
       "UpstreamPathTemplate": "/users/{everything}",
       "UpstreamHttpMethod": [ "Get" ],
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5218
+          "Host": "user",
+          "Port": 8082
         }
       ],
       "DownstreamPathTemplate": "/api/Users/{everything}",
@@ -142,8 +159,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5218
+          "Host": "user",
+          "Port": 8082
         }
       ],
       "DownstreamPathTemplate": "/api/Users/{id}/edit-profile",

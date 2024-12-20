@@ -11,7 +11,7 @@ namespace UserApi.Services
         {
             var config = new ProducerConfig
             {
-                BootstrapServers = "localhost:9092"
+                BootstrapServers = "kafka:9092"
             };
 
             _producer = new ProducerBuilder<Null, string>(config).Build();

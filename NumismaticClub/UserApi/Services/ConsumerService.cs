@@ -14,7 +14,7 @@ namespace UserApi.Services
         {
             var config = new ConsumerConfig
             {
-                BootstrapServers = "localhost:9092",
+                BootstrapServers = "kafka:9092",
                 GroupId = "user-group",
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };

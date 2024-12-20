@@ -19,6 +19,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AuthApi\AuthApi.csproj" />
+    <ProjectReference Include="..\NumismaticClub\NumismaticClub.csproj" />
+    <ProjectReference Include="..\UserApi\UserApi.csproj" />
   </ItemGroup>
 
   <ItemGroup>

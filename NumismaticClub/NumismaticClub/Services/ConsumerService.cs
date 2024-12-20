@@ -13,7 +13,7 @@ namespace NumismaticClub.Services
         {
             var config = new ConsumerConfig
             {
-                BootstrapServers = "localhost:9092",
+                BootstrapServers = "kafka:9092",
                 GroupId = "coin-group",
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
