@@ -33,8 +33,7 @@ namespace UserApi.Controllers
             return Ok(user);
         }
 
-        // TODO: change it
-        [HttpPut("{id:length(24)}")]
+        [HttpPut("{id:length(24)}/edit-profile")]
         public async Task<IActionResult> Update(string id, User updatedUser)
         {
             if (id != updatedUser.Id)
@@ -42,13 +41,23 @@ namespace UserApi.Controllers
                 return BadRequest("User ID mismatch.");
             }
 
+            // Id from jwt
+            var userId = Request.Headers["UserId"].ToString();
+
+            // Check that owner trying to change profile data
+            if (userId != id)
+            {
+                return BadRequest("You cannot change profile data other users.");
+            }
+
             var user = await _usersService.GetAsync(id);
+
             if (user is null)
             {
                 return NotFound();
             }
 
-            // If find coin in db update it
+            // If find user in db update it
             await _usersService.UpdateAsync(id, updatedUser);
 
             return NoContent();

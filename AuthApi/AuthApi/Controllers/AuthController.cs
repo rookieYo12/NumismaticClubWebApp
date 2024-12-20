@@ -38,6 +38,8 @@ namespace AuthApi.Controllers
                 return BadRequest("User with this login already exists.");
             }
 
+            // TODO: maybe encrypt password
+
             var newUser = new User
             {
                 Id = "",
@@ -93,7 +95,7 @@ namespace AuthApi.Controllers
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddMinutes(2);
             
-            await _userService.UpdateAsync(user.Login, user);
+            await _userService.UpdateAsync(user.Id, user);
 
             return Ok(new TokenModel
             {
@@ -141,7 +143,7 @@ namespace AuthApi.Controllers
 
                 // Update user
                 user.RefreshToken = newRefreshToken;
-                await _userService.UpdateAsync(user.Login, user);
+                await _userService.UpdateAsync(user.Id, user);
 
                 // TODO: cookie?
 
@@ -157,9 +159,10 @@ namespace AuthApi.Controllers
             }
         }
 
-        [HttpPut("update-auth/{id:length(24)}")]
-        public async Task<IActionResult> Update(string id, AuthInfo newInfo)
+        [HttpPut("{id:length(24)}/edit-auth")]
+        public async Task<IActionResult> Update(string id, AuthInfo newAuth)
         {
+            // Id from jwt
             var userId = Request.Headers["UserId"].ToString();
 
             // Check that owner trying to change auth data
@@ -169,15 +172,39 @@ namespace AuthApi.Controllers
             }
 
             var user = await _userService.GetByIdAsync(id);
+            
             if (user is null)
             {
                 return NotFound();
             }
 
-            // TODO: other logic...
+            user.Login = newAuth.Login;
+            user.Password = newAuth.Password;
+            
+            await _userService.UpdateAsync(user.Id, user);
+
+            return NoContent();
         }
 
-        [HttpDelete("delete/{id:length(24)}")]
+        // TODO: maybe check uncorrect role digits
+        [HttpPut("{id:length(24)}/edit-roles")]
+        public async Task<IActionResult> UpdateRoles(string id, UpdateRolesRequest request)
+        {
+            var user = await _userService.GetByIdAsync(id);
+            
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            user.Roles = request.Roles;
+
+            await _userService.UpdateAsync(id, user);
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id:length(24)}/delete")]
         public async Task<IActionResult> Delete(string id)
         {
             var roles = Request.Headers["Roles"].ToString().Split(',');

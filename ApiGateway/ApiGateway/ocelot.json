@@ -20,8 +20,8 @@
       "DownstreamPathTemplate": "/api/auth/{everything}"
     },
     {
-      "UpstreamPathTemplate": "/auth/{everything}/{id}",
-      "UpstreamHttpMethod": [ "Delete" ],
+      "UpstreamPathTemplate": "/auth/{id}/edit-role",
+      "UpstreamHttpMethod": [ "Put" ],
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
@@ -29,7 +29,25 @@
           "Port": 5043
         }
       ],
-      "DownstreamPathTemplate": "/api/auth/{everything}/{id}",
+      "DownstreamPathTemplate": "/api/auth/{id}/edit-role",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      },
+      "RouteClaimsRequirement": {
+        "Roles": "Admin"
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/auth/{id}/{everything}",
+      "UpstreamHttpMethod": [ "Put", "Delete" ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5043
+        }
+      ],
+      "DownstreamPathTemplate": "/api/auth/{id}/{everything}",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer"
       },
@@ -116,6 +134,28 @@
       },
       "RouteClaimsRequirement": {
         "Roles": "User"
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/users/{id}/edit-profile",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5218
+        }
+      ],
+      "DownstreamPathTemplate": "/api/Users/{id}/edit-profile",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "RouteClaimsRequirement": {
+        "Roles": "User"
+      },
+      "AddHeadersToRequest": {
+        "UserId": "Claims[Sub] > value"
       }
     }
   ]

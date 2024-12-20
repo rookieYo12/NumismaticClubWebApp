@@ -33,9 +33,9 @@ namespace AuthApi.Services
         public async Task CreateAsync(User newUser) =>
             await _usersCollection.InsertOneAsync(newUser);
 
-        // Update by login
-        public async Task UpdateAsync(string login, User updatedUser) =>
-            await _usersCollection.ReplaceOneAsync(x => x.Login == login, updatedUser);
+        // Update by id
+        public async Task UpdateAsync(string id, User updatedUser) =>
+            await _usersCollection.ReplaceOneAsync(x => x.Id == id, updatedUser);
 
         // Delete by id
         public async Task DeleteAsync(string id) =>
