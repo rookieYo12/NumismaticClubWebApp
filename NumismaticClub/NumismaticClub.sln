@@ -3,7 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35303.130
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NumismaticClub", "NumismaticClub\NumismaticClub.csproj", "{44E49BC3-CBF4-4B51-91C5-BFF1B076F172}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NumismaticClub", "NumismaticClub\NumismaticClub.csproj", "{44E49BC3-CBF4-4B51-91C5-BFF1B076F172}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiGateway", "ApiGateway\ApiGateway.csproj", "{913BA0C4-00F4-4136-994F-AC129A1F9576}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserApi", "UserApi\UserApi.csproj", "{719E25E6-C665-454C-BDC8-A310B8D01E4B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthApi", "AuthApi\AuthApi.csproj", "{D6AD4F48-47EF-4908-AF6D-525DFC803641}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{2A966D11-85C9-442E-94AB-4884211C883E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{913BA0C4-00F4-4136-994F-AC129A1F9576} = {913BA0C4-00F4-4136-994F-AC129A1F9576}
+		{D6AD4F48-47EF-4908-AF6D-525DFC803641} = {D6AD4F48-47EF-4908-AF6D-525DFC803641}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +27,22 @@ Global
 		{44E49BC3-CBF4-4B51-91C5-BFF1B076F172}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44E49BC3-CBF4-4B51-91C5-BFF1B076F172}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44E49BC3-CBF4-4B51-91C5-BFF1B076F172}.Release|Any CPU.Build.0 = Release|Any CPU
+		{913BA0C4-00F4-4136-994F-AC129A1F9576}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{913BA0C4-00F4-4136-994F-AC129A1F9576}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{913BA0C4-00F4-4136-994F-AC129A1F9576}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{913BA0C4-00F4-4136-994F-AC129A1F9576}.Release|Any CPU.Build.0 = Release|Any CPU
+		{719E25E6-C665-454C-BDC8-A310B8D01E4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{719E25E6-C665-454C-BDC8-A310B8D01E4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{719E25E6-C665-454C-BDC8-A310B8D01E4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{719E25E6-C665-454C-BDC8-A310B8D01E4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6AD4F48-47EF-4908-AF6D-525DFC803641}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6AD4F48-47EF-4908-AF6D-525DFC803641}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6AD4F48-47EF-4908-AF6D-525DFC803641}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6AD4F48-47EF-4908-AF6D-525DFC803641}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A966D11-85C9-442E-94AB-4884211C883E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A966D11-85C9-442E-94AB-4884211C883E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A966D11-85C9-442E-94AB-4884211C883E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A966D11-85C9-442E-94AB-4884211C883E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
