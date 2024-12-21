@@ -58,7 +58,7 @@ namespace NumismaticClub.Controllers
                 SlidingExpiration = TimeSpan.FromSeconds(30)
             });
 
-            return Ok(new { Message = "Data fetch from database.", Data = coin });
+            return Ok(coin);
         }
 
         [HttpPost]

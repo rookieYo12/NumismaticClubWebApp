@@ -5,6 +5,7 @@ using System.CodeDom.Compiler;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace AuthApi.Controllers
 {
@@ -15,13 +16,15 @@ namespace AuthApi.Controllers
         private readonly UserService _userService;
         private readonly TokenService _tokenService;
         private readonly ProducerService _producer;
+        //private readonly IDistributedCache _cache;
 
         public AuthController(UserService usersService, TokenService tokenService,
-            ProducerService producer)
+            ProducerService producer, IDistributedCache cache)
         {
             _userService = usersService;
             _tokenService = tokenService;
             _producer = producer;
+            //_cache = cache;
         }
 
         [HttpPost("signup")]
@@ -227,6 +230,11 @@ namespace AuthApi.Controllers
             }
 
             await _userService.DeleteAsync(id);
+
+            //await _cache.SetStringAsync("revoked_token", id, new DistributedCacheEntryOptions
+            //{
+            //    SlidingExpiration = TimeSpan.FromMinutes(15)
+            //});
 
             _producer.Produce("user-deleted", JsonSerializer.Serialize(id));
 
